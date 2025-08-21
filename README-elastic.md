@@ -195,6 +195,9 @@ spec:
           kubernetes.io/hostname: "worker-node-3"
     volumeClaim:
       claimName: elastic-pv-3
+```
 
+## 참고
+- 추가 플러그인 구성 필요 시 참고 : https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/create-custom-images
 $ oc create -f elastic-cluster.yaml
 ```
