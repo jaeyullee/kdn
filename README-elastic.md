@@ -192,7 +192,8 @@ $ oc create -f elastic-cluster.yaml
 ## 참고
 - 추가 플러그인 구성 필요 시 참고 : https://www.elastic.co/docs/deploy-manage/deploy/cloud-on-k8s/create-custom-images
 
-## Kibana 워크로드 배포
+
+## 6. Kibana 워크로드 배포
 ```
 $ vi kibana.yaml
 apiVersion: kibana.k8s.elastic.co/v1
@@ -232,5 +233,5 @@ spec:
     kind: Service
     name: kibana-sample-kb-http
 
-$ oc apply -f kibana.yaml
+$ oc create -f kibana.yaml
 ```
