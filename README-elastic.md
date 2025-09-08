@@ -156,7 +156,7 @@ $ vi elastic-cluster.yaml
 apiVersion: elasticsearch.k8s.elastic.co/v1
 kind: Elasticsearch
 metadata:
-  name: elasticsearch-rwo-cluster-manual-pvc
+  name: elasticsearch-cluster
 spec:
   image: bastion.ocp416.test:5002/elastic/elasticsearch:9.1.2  # 미러 레지스트리 이미지 주소로 추가
   version: 9.1.2
@@ -205,7 +205,7 @@ spec:
   version: 9.1.3
   count: 1
   elasticsearchRef:
-    name: "elasticsearch-sample"
+    name: "elasticsearch-cluster"
   podTemplate:
     spec:
       containers:
