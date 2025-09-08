@@ -206,6 +206,9 @@ spec:
   count: 1
   elasticsearchRef:
     name: "elasticsearch-cluster"
+  config:
+    xpack.fleet.enabled: false
+    telemetry.enabled: false
   podTemplate:
     spec:
       containers:
@@ -218,8 +221,10 @@ spec:
           httpGet:
             path: /login
             port: 5601
-          initialDelaySeconds: 60
+            scheme: HTTPS
+          initialDelaySeconds: 120
           periodSeconds: 10
+          insecureSkipVerify: true
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
