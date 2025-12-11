@@ -1,11 +1,19 @@
+## 1. NFS 서버 준비
+```
 mkdir -p /export/k8s
 chmod 777 /export/k8s
 echo "/export/k8s *(rw,sync,no_root_squash)" >> /etc/exports
 exportfs -rav
 systemctl enable --now nfs-server
+```
 
+## 2. Kubernetes에 NFS CSI Driver 설치
+```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/install-driver.yaml
+```
 
+## 3. StorageClass 작성
+```
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
@@ -18,7 +26,10 @@ reclaimPolicy: Delete
 volumeBindingMode: Immediate
 mountOptions:
   - nfsvers=4.1
+```
 
+## 4. PVC 생성
+```
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -30,11 +41,4 @@ spec:
   resources:
     requests:
       storage: 5Gi
-
-
-
-
-
-
-
-
+```
