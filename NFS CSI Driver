@@ -1,0 +1,40 @@
+mkdir -p /export/k8s
+chmod 777 /export/k8s
+echo "/export/k8s *(rw,sync,no_root_squash)" >> /etc/exports
+exportfs -rav
+systemctl enable --now nfs-server
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/deploy/install-driver.yaml
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: nfs-csi
+provisioner: nfs.csi.k8s.io
+parameters:
+  server: 10.0.0.5      # RHEL NFS 서버 IP
+  share: /export/k8s    # export 경로
+reclaimPolicy: Delete
+volumeBindingMode: Immediate
+mountOptions:
+  - nfsvers=4.1
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-csi
+  resources:
+    requests:
+      storage: 5Gi
+
+
+
+
+
+
+
+
