@@ -155,7 +155,7 @@ spec:
 ```
 ```
 $ oc apply -f clusterlogforwarder.yaml
-$ oc logs -f -n openshift-logging infra-logforwarder-instance-***** -c collector
+$ oc logs -f -n openshift-logging infra-logforwarder-instance-xxxxx -c collector
 ```
 
 
