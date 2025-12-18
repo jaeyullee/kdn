@@ -46,10 +46,67 @@ $ watch oc get node,mcp
 
 # 4. elasticsearch cluster 배포
 ```
+pv생성
+```
+```
 $ vi elasticsearch.yaml
-
+~~~~ github 편집기가 먹통이라 붙여넣기 못함.
+```
+```
+$ oc apply -f elasticsearch.yaml
 ```
 
+# 5. clusterLoggingForwarder 배포
+```
+$ oc create sa logging-collector -n openshift-logging
+$ oc adm policy add-cluster-role-to-user logging-collector-logs-writer -z logging-collector -n openshift-logging
+$ oc adm policy add-cluster-role-to-user collect-application-logs -z logging-collector -n openshift-logging
+$ oc adm policy add-cluster-role-to-user collect-infrastructure-logs -z logging-collector -n openshift-logging
+$ oc adm policy add-cluster-role-to-user collect-audit-logs -z logging-collector -n openshift-logging
+```
+```
+$ ELASTIC_PASSWORD=$(oc get secret es-infra-cluster-es-elastic-user -n elastic-infra -o jsonpath='{.data.elastic}' |base64 -d)
+$ oc create secret generic eck-secret --from-literal=username=elastic --from-literal=password=$ELASTIC_PASSWORD -n openshift-logging
+```
+> 아래 clusterlogforwarder는 infrastructure 로그만 전송하게 설정했음.
+> application 으로 분류되지만 인프라 성격의 operator 로그들 전송 및 audit 로그 전송 설정 필요함.
+```
+$ vi clusterlogforwarder.yaml
+apiVersion: observability.openshift.io/v1
+kind: ClusterLogForwarder
+metadata:
+  name: infra-logforwarder-instance
+  namespace: openshift-logging
+spec:
+  serviceAccount:
+    name: logging-collector
+  outputs:
+  - name: eck-elasticsearch
+    type: elasticsearch
+    elasticsearch:
+      url: https://es-infra-cluster-es-http.elastic-infra.svc:9200
+      index: "infra-logs"
+      version: 8  # 8.x 버전 이상은 무조건 8로 통일
+      authentication:
+        username:
+          secretName: eck-secret
+          key: username
+        password:
+          secretName: eck-secret
+          key: password
+    tls:
+      insecureSkipVerify: true
+  pipelines:
+  - name: infra-logs-to-eck
+    inputRefs:
+    - infrastructure
+    outputRefs:
+    - eck-elasticsearch
+```
+```
+$ oc apply -f clusterlogforwarder.yaml
+$ oc logs -f -n openshift-logging infra-logforwarder-instance-***** -c collector
+```
 
 
 
