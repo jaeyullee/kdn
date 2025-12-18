@@ -1,3 +1,5 @@
+##### ECK Operator 미러링해서 쓰는 방법이 아님.
+
 # elasticsearch operator 설치
 
 ## 1. elasticsearch operator CRD 구성 yaml 준비
