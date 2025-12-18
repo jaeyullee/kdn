@@ -46,7 +46,57 @@ $ watch oc get node,mcp
 
 # 4. elasticsearch cluster 배포
 ```
-pv생성
+$ vi elastic-pvs.yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-eck-1
+  labels:
+    index: "infra-1"
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-es-1
+  nfs:
+    path: /data/ocp/eck/pv1
+    server: 10.60.1.26
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-eck-2
+  labels:
+    index: "infra-2"
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-es-2
+  nfs:
+    path: /data/ocp/eck/pv2
+    server: 10.60.1.26
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-eck-2
+  labels:
+    index: "infra-3"
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: nfs-es-3
+  nfs:
+    path: /data/ocp/eck/pv2
+    server: 10.60.1.26
 ```
 ```
 $ vi elasticsearch.yaml
