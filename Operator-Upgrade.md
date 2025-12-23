@@ -130,7 +130,41 @@
 # 1. 오퍼레이터 업그레이드 패스 확인
 ```
 $ opm render registry.redhat.io/redhat/redhat-operator-index:v4.20 \
-  | jq 'select(.package == "web-terminal") | select(.schema == "olm.bundle") | {version: .properties[] | select(.type=="olm.package").value.version, replaces: .replaces}'
+| jq 'select(.package == "web-terminal" and .schema == "olm.channel")
+| { ChannelName: .name, UpgradeGraph: [.entries[] | { Bundle: .name, Replaces: .replaces, Skips: .skips, SkipRange: .skipRange }] }'
+{
+  "ChannelName": "fast",
+  "UpgradeGraph": [
+    {
+      "Bundle": "web-terminal.v1.10.0",
+      "Replaces": null,
+      "Skips": null,
+      "SkipRange": null
+    },
+...(중략)
+    {
+      "Bundle": "web-terminal.v1.14.0",
+      "Replaces": "web-terminal.v1.13.0",
+      "Skips": null,
+      "SkipRange": null
+    },
+    {
+      "Bundle": "web-terminal.v1.15.0",
+      "Replaces": "web-terminal.v1.14.0",
+      "Skips": null,
+      "SkipRange": null
+    }
+  ]
+}
+```
+> oc mirror 명령어로는 skip 관련 정보 확인이 불가능하여 opm 명령어로 확인
+```
+$ oc mirror list operators --catalog registry.redhat.io/redhat/redhat-operator-index:v4.20 --package web-terminal
+NAME          DISPLAY NAME  DEFAULT CHANNEL
+web-terminal                fast
+
+PACKAGE       CHANNEL  HEAD
+web-terminal  fast     web-terminal.v1.15.0
 ```
 
 
