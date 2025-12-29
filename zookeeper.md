@@ -42,6 +42,7 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
+
 $ vi zookeeper-pv2.yaml
 kind: PersistentVolume
 apiVersion: v1
@@ -57,6 +58,7 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
+
 $ vi zookeeper-pv3.yaml
 kind: PersistentVolume
 apiVersion: v1
@@ -72,6 +74,7 @@ spec:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Delete
   volumeMode: Filesystem
+
 $ oc create -f zookeeper-pv1.yaml
 $ oc create -f zookeeper-pv2.yaml
 $ oc create -f zookeeper-pv3.yaml
