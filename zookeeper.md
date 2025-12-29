@@ -13,18 +13,21 @@ global:
   security:
     allowInsecureImages: true  ## 수정
 image:
-  registry: docker.io
+  registry: docker.io          ## idms/itms를 쓰려는경우 registry/repository를 나눠서 설정하는 것을 권
   repository: bitnamilegacy/zookeeper
   tag: 3.9.3-debian-12-r22
   pullPolicy: IfNotPresent
 replicaCount: 3                ## 수정
+...
+persistence:
+  storageClass: ""             ## 비워두거나 "-"로 설정하여 동적 프로비저닝 방지 및 수동 PV 바인딩 유도
 
 $ helm package zookeeper
 ```
 
 ## 3. private helm repo 생성 및 업데이트
 ```
-$ ls   ## helm package 결과 생성된 zookeeper-x.y.z.tgz 파일명 잘 확인하기
+$ ls           ## helm package 결과 생성된 zookeeper-x.y.z.tgz 파일명 잘 확인하기
 $ curl --data-binary "@zookeeper-13.8.7.tgz" http://<chart-museum-server-ip>:8080/api/charts
 $ helm repo update
 $ helm search repo my-private-repo/zookeeper
