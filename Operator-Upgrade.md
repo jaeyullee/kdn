@@ -1,6 +1,6 @@
 > 전제조건 1) 넥서스 5000, 5001 포트 각각 사용하는 레지스트리 구성 <br/>
-> 전제조건 2) 5000 포트 사용하는 레지스트리 : 기 설치된 오퍼레이터 및 OCP 미러 레지스트리 역할
-> 전제조건 3) 5001 포트 사용하는 레지스트리 : 업그레이드를 위한 미러 레지스트리 역할
+> 전제조건 2) 5000 포트 사용하는 레지스트리 : 기 설치된 오퍼레이터 및 OCP 미러 레지스트리 역할 <br/>
+> 전제조건 3) 5001 포트 사용하는 레지스트리 : 업그레이드를 위한 미러 레지스트리 역할 <br/>
 > 해당 문서에서는 web-terminal 오퍼레이터만 업그레이드 하는 케이스를 정리합니다.
 
 ### ** 기존 미러 레지스트리 상태
@@ -24,11 +24,11 @@
   ]
 }
 ```
-> ocp4 : OCP 설치용 미러 이미지 저장 경로
-> olm-certified : Certified Operator 미러 이미지 저장 경로
-> olm-redhat : Redhat Operator 미러 이미지 저장 경로
-> openshift-logging, rhel9 : OCP 관리 툴 미러 이미지 저장 경로
-> openshift : OSUS를 위한 미러 이미지 저장 경로
+> ocp4 : OCP 설치용 미러 이미지 저장 경로 <br/>
+> olm-certified : Certified Operator 미러 이미지 저장 경로 <br/>
+> olm-redhat : Redhat Operator 미러 이미지 저장 경로 <br/>
+> openshift-logging, rhel9 : OCP 관리 툴 미러 이미지 저장 경로 <br/>
+> openshift : OSUS를 위한 미러 이미지 저장 경로 <br/>
 > oss : oss 용 컨테이너 이미지 저장 경로
 
 
@@ -74,7 +74,7 @@ web-terminal  fast     web-terminal.v1.15.0
 ```
 
 # 2. 업그레이드를 위한 미러 이미지 준비
-> 미러링 할 오퍼레이터 정보를 imageset-config.yaml에 작성합니다.
+> 미러링 할 오퍼레이터 정보를 imageset-config.yaml에 작성합니다. <br/>
 > 업그레이드를 위해서는 현재버전->업그레이드 할 버전 간 업그레이드 패스에 맞는 버전들 모두가 imageset-config.yaml에 포함되어야 합니다.
 ```
 $ vi imageset-config-for-upgrade.yaml
@@ -84,10 +84,13 @@ mirror:
   operators:
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
     packages:
-      - name: web-terminal                                                                                                               defaultChannel: fast
+      - name: web-terminal
+        defaultChannel: fast
         channels:
-        - name: fast                                                                                                                       minVersion: 1.8.0
-          maxVersion: 1.8.0                                                                                                              - name: fast
+        - name: fast
+          minVersion: 1.8.0
+          maxVersion: 1.8.0
+        - name: fast
           minVersion: 1.9.0
           maxVersion: 1.9.0
 vi imageset-config-for-new-version.yaml
@@ -97,7 +100,8 @@ mirror:
   operators:
   - catalog: registry.redhat.io/redhat/redhat-operator-index:v4.20
     packages:
-      - name: web-terminal                                                                                                               defaultChannel: fast
+      - name: web-terminal
+        defaultChannel: fast
         channels:
         - name: fast
           minVersion: 1.9.0
@@ -135,7 +139,7 @@ $ oc create -f mirror-data/for-upgrade/working-dir/cluster-resources/
 $ oc get subs -A
 $ oc edit subscription <subs_name> -n <ns_name>
 ```
-> subs의 .spec.source 값을 신규 반입한 catalogsource name으로 변경
+> subs의 .spec.source 값을 신규 반입한 catalogsource name으로 변경 <br/>
 > OCP 웹콘솔에서 업그레이드 수행
 
 # 5. 기존 버전 오퍼레이터 이미지 삭제
