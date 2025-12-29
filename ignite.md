@@ -12,7 +12,7 @@ $ helm repo update
 $ helm pull deliveryhero/ignite-kube --untar
 ```
 
-## 3. values.yaml 수정
+## 3. values.yaml 수정 후 차트 패키징
 ```
 $ vi ignite-kube/values.yaml
 image:
@@ -34,12 +34,25 @@ persistence:
   storageClass: "gp3-csi"  # 이부분은 수동 프로비저닝 방식으로 수정 필요
 
 # ... 나머지 설정 유지 혹은 수정
-```
 
-## 4. 차트 패키징 (ignite-kube 디렉토리를 tgz로 압축)
-helm package ignite-kube/
+$ helm package ignite-kube/
+```
 > 결과: ignite-kube-x.x.x.tgz 파일 생성됨
 
-## 5. ChartMuseum으로 업로드 (curl 사용)
+## 4. ChartMuseum으로 업로드 (curl 사용)
 > <chart-museum-server-ip> 부분을 실제 IP로 변경하세요.
-curl --data-binary "@ignite-kube-2.16.0.tgz" http://<chart-museum-server-ip>:8080/api/charts
+```
+$ curl --data-binary "@ignite-kube-2.16.0.tgz" http://<chart-museum-server-ip>:8080/api/charts
+$ helm repo add my-internal-repo http://<chart-museum-server-ip>:8080/api/charts
+$ helm repo update
+```
+
+## 5. 배포
+```
+$ oc new-project ignite-cluster
+$ oc adm policy add-scc-to-user anyuid -z default -n ignite-cluster
+$ oc adm policy add-scc-to-user anyuid -z my-ignite-sa -n ignite-cluster
+
+$ helm install my-ignite my-internal-repo/ignite-kube -n ignite-cluster
+$ oc get pods -n ignite-cluster
+```
