@@ -10,7 +10,6 @@ image:
   repository: zookeeper/zookeeper ## 수정
   tag: 3.9.3 ## 수정
   pullPolicy: IfNotPresent
-
 replicaCount: 3  ## 수정
 
 $ helm package zookeeper
