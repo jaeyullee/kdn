@@ -24,7 +24,8 @@ $ helm package zookeeper
 
 ## 3. private helm repo 생성 및 업데이트
 ```
-$ curl --data-binary "@zookeeper-3.9.3.tgz" http://<chart-museum-server-ip>:8080/api/charts
+$ ls   # helm package 결과 생성된 zookeeper-x.y.z.tgz 파일명 잘 확인하기
+$ curl --data-binary "@zookeeper-13.8.7.tgz" http://<chart-museum-server-ip>:8080/api/charts
 $ helm repo update
 $ helm search repo my-private-repo/zookeeper
 ```
