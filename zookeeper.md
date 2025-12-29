@@ -5,7 +5,6 @@ $ vi zookeeper/values.yaml
 global:
   security:
     allowInsecureImages: true  ## 수정
-
 image:
   registry: bastion.ocp419.test:5001  ## 수정
   repository: zookeeper/zookeeper ## 수정
@@ -27,7 +26,8 @@ $ vi /etc/exports
 /nfs/zookeeper/pv3 *(no_root_squash,rw)
 $ exportfs -r
 $ showmount -e
-
+```
+```
 $ vi zookeeper-pv1.yaml
 kind: PersistentVolume
 apiVersion: v1
