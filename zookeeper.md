@@ -42,18 +42,36 @@ $ exportfs -r
 $ showmount -e
 ```
 ```
-$ vi zookeeper-pv1.yaml
-kind: PersistentVolume
-apiVersion: v1
+$ vi idms-zookeeper.yaml
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
 metadata:
-  name: zookeeper-1
+  name: bitnami-zookeeper-mirror
 spec:
-  capacity:
-    storage: 8Gi
-  nfs:
-    server: 192.168.10.31
-    path: /nfs/zookeeper/pv1
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeRec요$$$ helm install my-zookeeper my-private-repo/zookeeper
+  imageDigestMirrors:
+    - source: docker.io/bitnamilegacy/zookeeper
+      mirrors:
+        - bastion.ocp419.test:5001/zookeeper/zookeeper
+
+$ vi itms-zookeeper.yaml
+apiVersion: config.openshift.io/v1
+kind: ImageTagMirrorSet
+metadata:
+  name: bitnami-zookeeper-tag-mirror
+spec:
+  imageTagMirrors:
+    - source: docker.io/bitnamilegacy/zookeeper
+      mirrors:
+        - bastion.ocp419.test:5001/zookeeper/zookeeper
+
+$ oc apply -f idms-zookeeper.yaml
+$ oc apply -f itms-zookeeper.yaml
+```
+
+
+
+## 6. helm 차트로 배포
+```
+$ oc new-project zookeeper
+$ helm install my-zookeeper my-private-repo/zookeeper
 ```
