@@ -43,8 +43,8 @@ $ helm package ignite-kube/
 > <chart-museum-server-ip> 부분을 실제 IP로 변경하세요.
 ```
 $ curl --data-binary "@ignite-kube-2.16.0.tgz" http://<chart-museum-server-ip>:8080/api/charts
-$ helm repo add my-internal-repo http://<chart-museum-server-ip>:8080/api/charts
 $ helm repo update
+$ helm search repo my-private-repo/
 ```
 
 ## 5. 배포
