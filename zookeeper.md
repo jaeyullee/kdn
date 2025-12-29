@@ -1,4 +1,11 @@
-## 1. 헬름 차트 다운로드 및 설정변경
+## 1. private helm repo 생성
+```
+$ docker run --rm -it -p 8080:8080 -v $(helm_repo_data_dir):/charts chartmuseum/chartmuseum:latest
+$ helm repo add my-private-repo http://<chart-museum-server-ip>:8080
+$ helm repo update
+```
+
+## 2. 헬름 차트 다운로드 및 설정변경
 ```
 $ helm pull bitnami/zookeeper --untar
 $ vi zookeeper/values.yaml
@@ -15,7 +22,14 @@ replicaCount: 3  ## 수정
 $ helm package zookeeper
 ```
 
-## 2. pv 생성
+## 3. private helm repo 생성 및 업데이트
+```
+$ curl --data-binary "@zookeeper-3.9.3.tgz" http://<chart-museum-server-ip>:8080/api/charts
+$ helm repo update
+$ helm search repo my-private-repo/zookeeper
+```
+
+## 4. pv 생성
 ```
 $ mkdir -p /nfs/zookeeper/{pv1,pv2,pv3}
 $ chmod 777 -R /nfs/zookeeper
@@ -80,22 +94,12 @@ $ oc create -f zookeeper-pv2.yaml
 $ oc create -f zookeeper-pv3.yaml
 ```
 
-## 3. helm 차트로 배포
+## 5. helm 차트로 배포
 ```
 $ oc new-project zookeeper
 $ oc image mirror docker.io/bitnamilegacy/zookeeper:3.9.3-debian-12-r22 bastion.ocp419.test:5001/zookeeper/zookeeper:3.9.3
 
-$ helm install my-zookeeper zookeeper-13.8.7.tgz
+$ helm install my-zookeeper my-private-repo/zookeeper
 ```
 
 
-
-
-## 참고. 프라이빗 레포 사용
-```
-$ docker run --rm -it -p 8080:8080 -v $(pwd):/charts chartmuseum/chartmuseum:latest
-$ helm repo add my-private-repo http://<chart-museum-server-ip>:8080
-$ helm repo update
-
-$ helm install my-zookeeper my-private-repo/<chart>
-```
