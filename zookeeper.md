@@ -13,11 +13,11 @@ global:
   security:
     allowInsecureImages: true  ## 수정
 image:
-  registry: bastion.ocp419.test:5001  ## 수정
-  repository: zookeeper/zookeeper ## 수정
-  tag: 3.9.3 ## 수정
+  registry: docker.io/bitnamilegacy/zookeeper
+  repository: bitnamilegacy/zookeeper
+  tag: 3.9.3-debian-12-r22
   pullPolicy: IfNotPresent
-replicaCount: 3  ## 수정
+replicaCount: 3                ## 수정
 
 $ helm package zookeeper
 ```
@@ -95,12 +95,37 @@ $ oc create -f zookeeper-pv2.yaml
 $ oc create -f zookeeper-pv3.yaml
 ```
 
-## 5. helm 차트로 배포
+## 5. 이미지 미러링
+> 미러 레지스트리에 zookeeper 이미지 반입
+```
+$ vi idms-zookeeper.yaml
+apiVersion: config.openshift.io/v1
+kind: ImageDigestMirrorSet
+metadata:
+  name: bitnami-zookeeper-mirror
+spec:
+  imageDigestMirrors:
+    - source: docker.io/bitnamilegacy/zookeeper
+      mirrors:
+        - bastion.ocp419.test:5001/zookeeper/zookeeper
+
+$ vi itms-zookeeper.yaml
+apiVersion: config.openshift.io/v1
+kind: ImageTagMirrorSet
+metadata:
+  name: bitnami-zookeeper-tag-mirror
+spec:
+  imageTagMirrors:
+    - source: docker.io/bitnamilegacy/zookeeper
+      mirrors:
+        - bastion.ocp419.test:5001/zookeeper/zookeeper
+
+$ oc apply -f idms-zookeeper.yaml
+$ oc apply -f itms-zookeeper.yaml
+```
+
+## 6. helm 차트로 배포
 ```
 $ oc new-project zookeeper
-$ oc image mirror docker.io/bitnamilegacy/zookeeper:3.9.3-debian-12-r22 bastion.ocp419.test:5001/zookeeper/zookeeper:3.9.3
-
 $ helm install my-zookeeper my-private-repo/zookeeper
 ```
-
-
