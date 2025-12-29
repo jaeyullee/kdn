@@ -13,7 +13,7 @@ global:
   security:
     allowInsecureImages: true  ## 수정
 image:
-  registry: docker.io/bitnamilegacy/zookeeper
+  registry: docker.io
   repository: bitnamilegacy/zookeeper
   tag: 3.9.3-debian-12-r22
   pullPolicy: IfNotPresent
@@ -24,7 +24,7 @@ $ helm package zookeeper
 
 ## 3. private helm repo 생성 및 업데이트
 ```
-$ ls   # helm package 결과 생성된 zookeeper-x.y.z.tgz 파일명 잘 확인하기
+$ ls   ## helm package 결과 생성된 zookeeper-x.y.z.tgz 파일명 잘 확인하기
 $ curl --data-binary "@zookeeper-13.8.7.tgz" http://<chart-museum-server-ip>:8080/api/charts
 $ helm repo update
 $ helm search repo my-private-repo/zookeeper
@@ -55,77 +55,5 @@ spec:
     path: /nfs/zookeeper/pv1
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  volumeMode: Filesystem
-
-$ vi zookeeper-pv2.yaml
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: zookeeper-2
-spec:
-  capacity:
-    storage: 8Gi
-  nfs:
-    server: 192.168.10.31
-    path: /nfs/zookeeper/pv2
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  volumeMode: Filesystem
-
-$ vi zookeeper-pv3.yaml
-kind: PersistentVolume
-apiVersion: v1
-metadata:
-  name: zookeeper-3
-spec:
-  capacity:
-    storage: 8Gi
-  nfs:
-    server: 192.168.10.31
-    path: /nfs/zookeeper/pv3
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
-  volumeMode: Filesystem
-
-$ oc create -f zookeeper-pv1.yaml
-$ oc create -f zookeeper-pv2.yaml
-$ oc create -f zookeeper-pv3.yaml
-```
-
-## 5. 이미지 미러링
-> 미러 레지스트리에 zookeeper 이미지 반입
-```
-$ vi idms-zookeeper.yaml
-apiVersion: config.openshift.io/v1
-kind: ImageDigestMirrorSet
-metadata:
-  name: bitnami-zookeeper-mirror
-spec:
-  imageDigestMirrors:
-    - source: docker.io/bitnamilegacy/zookeeper
-      mirrors:
-        - bastion.ocp419.test:5001/zookeeper/zookeeper
-
-$ vi itms-zookeeper.yaml
-apiVersion: config.openshift.io/v1
-kind: ImageTagMirrorSet
-metadata:
-  name: bitnami-zookeeper-tag-mirror
-spec:
-  imageTagMirrors:
-    - source: docker.io/bitnamilegacy/zookeeper
-      mirrors:
-        - bastion.ocp419.test:5001/zookeeper/zookeeper
-
-$ oc apply -f idms-zookeeper.yaml
-$ oc apply -f itms-zookeeper.yaml
-```
-
-## 6. helm 차트로 배포
-```
-$ oc new-project zookeeper
-$ helm install my-zookeeper my-private-repo/zookeeper
+  persistentVolumeRec요$$$ helm install my-zookeeper my-private-repo/zookeeper
 ```
