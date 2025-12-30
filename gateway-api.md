@@ -6,6 +6,8 @@ $ oc patch featuregate cluster --type='merge' -p '{"spec": {"featureSet": "TechP
 
 ## 2. Service Mesh 3 Operator 설치
 > OpenShift 4.20의 "Native Gateway API" 기능은 내부적으로 "Red Hat OpenShift Service Mesh v3 (Sail Operator)"를 엔진으로 사용하기 때문에 설치가 필요합니다.
+> The OpenShift Container Platform Gateway API implementation relies on the Cluster Ingress Operator (CIO) to install and manage a specific version of OpenShift Service Mesh (OSSM v3.x) in the openshift-ingress namespace.
+> - [문서](https://docs.redhat.com/en/documentation/openshift_container_platform/4.20/html/ingress_and_load_balancing/configuring-ingress-cluster-traffic#nw-ingress-gateway-api-enable_ingress-gateway-api)
 
 ## 3. Gateway API 배포
 ```
@@ -101,7 +103,7 @@ $ oc get po -w
 > Servicemesh3 stable-3.2 버전으로 설치하면 기능은 있으나 DP 지원단계입니다. <br/>
 
 > Gateway API Experimental Channel (TLSRoute, TCPRoute) : DP
-> [문서](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.2/html-single/release_notes/index#istio-ambient-mode_ossm-release-notes-support-tables)
+> - [문서](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.2/html-single/release_notes/index#istio-ambient-mode_ossm-release-notes-support-tables)
 
 ```
 $ vi tcproute.yaml
