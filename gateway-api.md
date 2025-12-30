@@ -29,9 +29,80 @@ $ oc get deployment -n openshift-ingress
 $ oc new-project gateway-ns
 $ oc annotate namespace gateway-ns openshift.io/node-selector="node-role.kubernetes.io/router=" --overwrite
 $ oc get namespace gateway-ns -o yaml
+
+$ vi gateway.yaml
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: my-tcp-gateway
+  namespace: gateway-ns
+spec:
+  gatewayClassName: openshift-default
+  listeners:
+  - name: tcp-9000
+    protocol: TCP
+    port: 9000
+    allowedRoutes:
+      namespaces:
+        from: All  # 중요: 다른 네임스페이스(tcp-app-ns)의 연결 허용
+
+$ oc create -f gateway.yaml
+```
+
+## 5. TCP 테스트 앱 생성
+> 테스트를 위해 앱 배포합니다. <br/>
+> alpine/socat 이미지 반입이 필요합니다.
+```
+$ vi tcp-test-app.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tcp-echo-server
+  namespace: tcp-app-ns
+  labels:
+    app: tcp-echo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tcp-echo
+  template:
+    metadata:
+      labels:
+        app: tcp-echo
+    spec:
+      containers:
+      - name: socat
+        image: nexus.kscada.kdneri.com:5002/app/alpine/socat:latest
+        args: ["-v", "TCP-LISTEN:9000,fork", "EXEC:/bin/cat"]
+        ports:
+        - containerPort: 9000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tcp-echo-service
+  namespace: tcp-app-ns
+spec:
+  selector:
+    app: tcp-echo
+  ports:
+  - port: 9000
+    targetPort: 9000
+    protocol: TCP
+
+$ oc new-project tcp-app-ns
+$ oc create -f tcp-test-app.yaml
+$ oc get po -w
 ```
 
 ## 5. TCPRoute 생성
+> 아직 OCP에서는 해당 기능 지원 안하는것으로 확인되었습니다. <br/>
+> Servicemesh3 stable-3.2 버전으로 설치하면 기능은 있으나 DP 지원단계입니다. <br/>
+
+> Gateway API Experimental Channel (TLSRoute, TCPRoute) : DP
+> [문서](https://docs.redhat.com/en/documentation/red_hat_openshift_service_mesh/3.2/html-single/release_notes/index#istio-ambient-mode_ossm-release-notes-support-tables)
+
 ```
 $ vi tcproute.yaml
 apiVersion: gateway.networking.k8s.io/v1alpha2
@@ -43,7 +114,7 @@ spec:
   parentRefs:
   - name: my-tcp-gateway
     namespace: gateway-ns    # Gateway가 있는 네임스페이스 지정
-   namespace: gateway-ns     # Gateway가 있는 
+    sectionName: tcp-9000 # Gateway의 리스너 이름 지정
   rules:
   - backendRefs:
     - name: tcp-echo-service
